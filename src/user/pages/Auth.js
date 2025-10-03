@@ -25,7 +25,6 @@ const Auth = () => {
   // estado parad determinar si estamos haciendo login o no, si estamos haciendo sign up, no estamos en modo login
   const [isLoginMode, setIsLoginMode] = useState(true);
 
-  // para verificar si está cargando
   const { isLoading, error, sendRequest, clearError } = useHttpCLient();
 
   // hacemos  uso del hook creado por nosotros con los valores iniciales que queremos que tengan los inputs
@@ -94,7 +93,7 @@ const Auth = () => {
     if (isLoginMode) {
       // se hace el fetch
       try {
-        await sendRequest(
+        const responseData = await sendRequest(
           "http://localhost:5000/api/users/login",
           "POST",
           JSON.stringify({
@@ -105,13 +104,13 @@ const Auth = () => {
             "Content-Type": "application/json",
           }
         );
-        auth.login();
+        auth.login(responseData.user.id);
         history.push("/");
       } catch (err) {}
     } else {
       try {
         // se hace el fetch
-        await sendRequest(
+        const responseData = await sendRequest(
           "http://localhost:5000/api/users/signup",
           "POST",
           JSON.stringify({
@@ -123,7 +122,7 @@ const Auth = () => {
             "Content-Type": "application/json",
           }
         );
-        auth.login();
+        auth.login(responseData.user.id);
         history.push("/");
       } catch (err) {}
     }

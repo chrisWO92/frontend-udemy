@@ -17,14 +17,17 @@ import { AuthContext } from "./shared/context/auth-context";
 // Este es el segundo nivel de nuestra aplicación, el componente principal App
 const App = () => {
   // el siguiente estado se usa para determinar si el usuario está logeado o no
-  const [isLoggedIn, setIsLoggedIn] = useState();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userId, setuserId] = useState(false);
 
-  const login = useCallback(() => {
+  const login = useCallback((uid) => {
     setIsLoggedIn(true);
+    setuserId(uid);
   }, []);
 
   const logout = useCallback(() => {
     setIsLoggedIn(false);
+    setuserId(null);
   }, []);
 
   let routes;
@@ -73,7 +76,12 @@ const App = () => {
     // al envolver todas las rutas y sus componentes dentro del Provider, damos acceso a todo lo que queda envuelto a la información del AuthContext.
     // tenemos que pasar un value y cada vez que este cambie, todo lo que está dentro del provider renderizará nuevamente.
     <AuthContext.Provider
-      value={{ isLoggedIn: isLoggedIn, login: login, logout: logout }}
+      value={{
+        isLoggedIn: isLoggedIn,
+        userId: userId,
+        login: login,
+        logout: logout,
+      }}
     >
       <Router>
         <MainNavigation />
