@@ -13,7 +13,7 @@ import Card from "../../shared/components/UIElements/Card.js";
 import { AuthContext } from "../../shared/context/auth-context.js";
 import ErrorModal from "../../shared/components/UIElements/ErrorModal.js";
 import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner.js";
-import { useHttpCLient } from "../../shared/hooks/http-hook.js";
+import { useHttpClient } from "../../shared/hooks/http-hook.js";
 
 // otra de las páginas que se mostrará en la aplicación, la página de autenticación de usuario, asociado a usuarios
 const Auth = () => {
@@ -25,7 +25,7 @@ const Auth = () => {
   // estado parad determinar si estamos haciendo login o no, si estamos haciendo sign up, no estamos en modo login
   const [isLoginMode, setIsLoginMode] = useState(true);
 
-  const { isLoading, error, sendRequest, clearError } = useHttpCLient();
+  const { isLoading, error, sendRequest, clearError } = useHttpClient();
 
   // hacemos  uso del hook creado por nosotros con los valores iniciales que queremos que tengan los inputs
   const [formState, inputHandler, setFormData] = useForm(
@@ -164,8 +164,8 @@ const Auth = () => {
             element="input"
             type="password"
             label="Password"
-            validators={[VALIDATOR_MINLENGTH(10)]}
-            errorText="Please enter a valid password, at least 5 characters."
+            validators={[VALIDATOR_MINLENGTH(6)]}
+            errorText="Please enter a valid password, at least 6 characters."
             onInput={inputHandler}
           />
           {/* Cuando el formulario no es válido, el botón deberá estar deshabilitado */}

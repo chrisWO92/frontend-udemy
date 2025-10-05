@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import Input from "../../shared/components/FormElements/Input.js";
 import Button from "../../shared/components/FormElements/Button.js";
-import { useHttpCLient } from "../../shared/hooks/http-hook.js";
+import { useHttpClient } from "../../shared/hooks/http-hook.js";
 import "./PlaceForm.css";
 import {
   VALIDATOR_MINLENGTH,
@@ -18,7 +18,7 @@ const NewPlace = () => {
   const auth = useContext(AuthContext);
   const history = useHistory();
 
-  const { isLoading, error, sendRequest, clearError } = useHttpCLient();
+  const { isLoading, error, sendRequest, clearError } = useHttpClient();
   // invocamos el useForm y le pasamos los valores iniciales
   const [formState, inputHandler] = useForm(
     {

@@ -1,6 +1,6 @@
 import { useCallback, useState, useRef, useEffect } from "react";
 
-export const useHttpCLient = () => {
+export const useHttpClient = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState();
 
@@ -8,9 +8,13 @@ export const useHttpCLient = () => {
 
   const sendRequest = useCallback(
     async (url, method = "GET", body = null, headers = {}) => {
+      console.log("🔹 sendRequest called:", { url });
       setIsLoading(true);
+      console.log("🟡 isLoading just set to TRUE");
+
       const httpAbortCtrl = new AbortController();
       activeHttpRequests.current.push(httpAbortCtrl);
+
       try {
         const response = await fetch(url, {
           method,
@@ -20,7 +24,6 @@ export const useHttpCLient = () => {
         });
 
         const responseData = await response.json();
-
         activeHttpRequests.current = activeHttpRequests.current.filter(
           (reqCtrl) => reqCtrl !== httpAbortCtrl
         );
@@ -28,16 +31,20 @@ export const useHttpCLient = () => {
         if (!response.ok) {
           throw new Error(responseData.message);
         }
+
+        console.log("🟢 Request finished OK");
         setIsLoading(false);
+        console.log("🔵 isLoading set to FALSE");
         return responseData;
       } catch (err) {
-        // Ignorar si es un abort
         if (err.name === "AbortError") {
           console.log("Request aborted");
         } else {
+          console.log("🔴 Error:", err.message);
           setError(err.message);
         }
         setIsLoading(false);
+        console.log("🔵 isLoading set to FALSE (catch)");
         throw err;
       }
     },
@@ -53,6 +60,8 @@ export const useHttpCLient = () => {
       activeHttpRequests.current.forEach((abortCtrl) => abortCtrl.abort());
     };
   }, []);
+
+  console.log("💠 Hook render:", { isLoading, error });
 
   return { isLoading, error, sendRequest, clearError };
 };

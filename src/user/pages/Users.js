@@ -2,12 +2,12 @@ import React, { useEffect, useState } from "react";
 import UsersList from "../components/UsersList";
 import ErrorModal from "../../shared/components/UIElements/ErrorModal";
 import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
-import { useHttpCLient } from "../../shared/hooks/http-hook.js";
+import { useHttpClient } from "../../shared/hooks/http-hook.js";
 
 // Esta es una de las páginas que se mostrará en la aplicación asociadas a usuarios
 const Users = () => {
   const [loadedUsers, setLoadedUsers] = useState();
-  const { isLoading, error, sendRequest, clearError } = useHttpCLient();
+  const { isLoading, error, sendRequest, clearError } = useHttpClient();
 
   useEffect(() => {
     const fetchUsers = async () => {

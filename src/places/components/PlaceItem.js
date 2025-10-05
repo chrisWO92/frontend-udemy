@@ -5,13 +5,19 @@ import Button from "../../shared/components/FormElements/Button";
 import Modal from "../../shared/components/UIElements/Modal";
 import Map from "../../shared/components/UIElements/Map";
 import { AuthContext } from "../../shared/context/auth-context";
+import { useHttpClient } from "../../shared/hooks/http-hook";
+import ErrorModal from "../../shared/components/UIElements/ErrorModal.js";
+import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner.js";
+import { useHistory } from "react-router-dom";
 
 // componente para renderizar un Ítem de la lista de lugares
 const PlaceItem = (props) => {
   const auth = useContext(AuthContext);
+  const { isLoading, error, sendRequest, clearError } = useHttpClient();
   // estado para mostrar/ocultar mapa
   const [showMap, setShowMap] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const history = useHistory();
 
   // funciones para abrir y cerrar mapa
   const openMapHandler = () => setShowMap(true);
@@ -28,14 +34,22 @@ const PlaceItem = (props) => {
   };
 
   // confirmar borrado
-  const confirmDeleteHandler = () => {
+  const confirmDeleteHandler = async () => {
     setShowConfirmModal(false);
-    console.log("DELETING...");
+    try {
+      await sendRequest(
+        `http://localhost:5000/api/places/${props.id}`,
+        "DELETE"
+      );
+      props.onDelete(props.id);
+    } catch (error) {}
+    history.push("/" + auth.userId + "/places");
   };
 
   return (
     <React.Fragment>
       {/* pasamos todas las props que necesita el Modal para funcionar correctamente */}
+      <ErrorModal error={error} onClear={clearError} />
       <Modal
         show={showMap}
         onCancel={closeMapHandler}
@@ -71,6 +85,7 @@ const PlaceItem = (props) => {
       </Modal>
       <li className="place-item">
         <Card className="place-item__content">
+          {isLoading && <LoadingSpinner asOverlay />}
           <div className="place-item__image">
             <img src={props.image} alt={props.title} />
           </div>
@@ -85,10 +100,10 @@ const PlaceItem = (props) => {
             </Button>
 
             {/* Sólo si estamos logeados podremos ver estos botones */}
-            {auth.isLoggedIn && (
+            {auth.userId === props.creatorId && (
               <Button to={`/places/${props.id}`}>EDIT</Button>
             )}
-            {auth.isLoggedIn && (
+            {auth.userId === props.creatorId && (
               <Button danger onClick={showDeleteWarningHandler}>
                 DELETE
               </Button>
