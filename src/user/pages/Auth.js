@@ -14,6 +14,7 @@ import { AuthContext } from "../../shared/context/auth-context.js";
 import ErrorModal from "../../shared/components/UIElements/ErrorModal.js";
 import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner.js";
 import { useHttpClient } from "../../shared/hooks/http-hook.js";
+import ImageUpload from "../../shared/components/FormElements/ImageUpload.js";
 
 // otra de las páginas que se mostrará en la aplicación, la página de autenticación de usuario, asociado a usuarios
 const Auth = () => {
@@ -53,6 +54,7 @@ const Auth = () => {
           ...formState.inputs,
           // sobreescribimos el input 'name'
           name: undefined,
+          image: undefined,
         },
         // definimos el estado de validación general del formulario a través de la validez de los inputs disponibles
         formState.inputs.email.isValid && formState.inputs.password.isValid
@@ -65,6 +67,10 @@ const Auth = () => {
           // sobreescribimos el input 'name'
           name: {
             value: "",
+            isValid: false,
+          },
+          image: {
+            value: null,
             isValid: false,
           },
         },
@@ -109,18 +115,17 @@ const Auth = () => {
       } catch (err) {}
     } else {
       try {
+        const formData = new FormData();
+        formData.append("email", formState.inputs.email.value);
+        formData.append("nam", formState.inputs.name.value);
+        formData.append("password", formState.inputs.password.value);
+        formData.append("image", formState.inputs.password.image);
+
         // se hace el fetch
         const responseData = await sendRequest(
           "http://localhost:5000/api/users/signup",
           "POST",
-          JSON.stringify({
-            name: formState.inputs.name.value,
-            email: formState.inputs.email.value,
-            password: formState.inputs.password.value,
-          }),
-          {
-            "Content-Type": "application/json",
-          }
+          formData
         );
         auth.login(responseData.user.id);
         history.push("/");
@@ -149,6 +154,9 @@ const Auth = () => {
               errorText="Please enter your name."
               onInput={inputHandler}
             />
+          )}
+          {!isLoginMode && (
+            <ImageUpload center id="image" onInput={inputHandler} />
           )}
           <Input
             id="email"
