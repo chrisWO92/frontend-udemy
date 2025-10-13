@@ -117,9 +117,9 @@ const Auth = () => {
       try {
         const formData = new FormData();
         formData.append("email", formState.inputs.email.value);
-        formData.append("nam", formState.inputs.name.value);
+        formData.append("name", formState.inputs.name.value);
         formData.append("password", formState.inputs.password.value);
-        formData.append("image", formState.inputs.password.image);
+        formData.append("image", formState.inputs.image.value);
 
         // se hace el fetch
         const responseData = await sendRequest(
@@ -156,7 +156,12 @@ const Auth = () => {
             />
           )}
           {!isLoginMode && (
-            <ImageUpload center id="image" onInput={inputHandler} />
+            <ImageUpload
+              center
+              id="image"
+              onInput={inputHandler}
+              errorText="Please provide an image"
+            />
           )}
           <Input
             id="email"
