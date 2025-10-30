@@ -1,5 +1,5 @@
 import "./App.css";
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import {
   BrowserRouter as Router,
   Route,
@@ -17,24 +17,51 @@ import { AuthContext } from "./shared/context/auth-context";
 // Este es el segundo nivel de nuestra aplicación, el componente principal App
 const App = () => {
   // el siguiente estado se usa para determinar si el usuario está logeado o no
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [token, setToken] = useState(false);
   const [userId, setuserId] = useState(false);
 
-  const login = useCallback((uid) => {
-    setIsLoggedIn(true);
+  const login = useCallback((uid, token, expirationDate) => {
+    setToken(token);
     setuserId(uid);
+    const tokenExpirationDate =
+      expirationDate || new Date(new Date().getTime() + 1000 * 60 * 60);
+    localStorage.setItem(
+      "userData",
+      JSON.stringify({
+        userId: uid,
+        token: token,
+        expiration: tokenExpirationDate.toISOString(),
+      })
+    );
   }, []);
 
   const logout = useCallback(() => {
-    setIsLoggedIn(false);
+    setToken(null);
     setuserId(null);
+    localStorage.removeItem("userData");
   }, []);
 
+  useEffect(() => {
+    const storedData = JSON.parse(localStorage.getItem("userData"));
+    if (
+      storedData &&
+      storedData.token &&
+      new Date(storedData.expiration) > new Date()
+    ) {
+      login(
+        storedData.userId,
+        storedData.token,
+        new Date(storedData.expiration)
+      );
+    }
+  }, [login]);
+
   let routes;
+  console.log(token);
 
   // definimos las rutas que se renderizan si estamos logeados o no
   // Switch sirve para que el enrutador renderice sólo una de las rutas cuando encuentre la primera coincidencia, ignorando el resto. Esto es útil porque si no se pone Switch, React Router evaluaría todas las rutas que coincidan con la URL y las renderizaría todas juntas.
-  if (isLoggedIn) {
+  if (token) {
     routes = (
       <Switch>
         <Route path="/" exact>
@@ -77,7 +104,8 @@ const App = () => {
     // tenemos que pasar un value y cada vez que este cambie, todo lo que está dentro del provider renderizará nuevamente.
     <AuthContext.Provider
       value={{
-        isLoggedIn: isLoggedIn,
+        isLoggedIn: !!token,
+        token: token,
         userId: userId,
         login: login,
         logout: logout,
